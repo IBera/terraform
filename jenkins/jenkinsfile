@@ -1,0 +1,12 @@
+pipeline {
+    agent {
+        docker { image 'ibera/iac:v2' }
+    }
+    stages {
+        stage('az login') {
+            steps {
+                sh 'az version'
+            }
+        }
+    }
+}
