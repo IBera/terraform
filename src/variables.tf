@@ -2,7 +2,7 @@
 # VARIABLES
 #################################################################
 
-variable "resource_group_suffix" {
+variable "resource_group_name" {
   type = string
 }
 

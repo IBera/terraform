@@ -71,7 +71,7 @@ pipeline {
                         dir("src") {
                         sh """
                         echo "Creating Terraform Plan"
-                        terraform plan -var "resource_group_suffix=$RG_NAME" -var "resource_group_region=$LOCATION"
+                        terraform plan -var "resource_group_name=$RG_NAME" -var "resource_group_region=$LOCATION"
                         """
                         }
                     }
