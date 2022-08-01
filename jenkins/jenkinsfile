@@ -88,5 +88,43 @@ pipeline {
             }
         }
 
+        stage('Terraform Apply'){
+            
+            options {
+              azureKeyVault(
+                credentialID: "596bada5-c154-4b86-9da4-57721c2385e1",
+                keyVaultURL: "${params.AZURE_KEYVAULT_URL}",
+                secrets: [
+                    [envVariable: 'BACKEND_STORAGE_ACCOUNT_NAME', name: 'BACKEND-STORAGE-ACCOUNT-NAME', secretType: 'Secret'],
+                    [envVariable: 'BACKEND_STORAGE_ACCOUNT_CONTAINER_NAME', name: 'BACKEND-STORAGE-ACCOUNT-CONTAINER-NAME', secretType: 'Secret'],
+                    [envVariable: 'BACKEND_KEY', name: 'BACKEND-KEY', secretType: 'Secret'],
+                    [envVariable: 'RG_NAME', name: 'RG-NAME', secretType: 'Secret'],
+                    [envVariable: 'RGPROJECT', name: 'RGPROJECT', secretType: 'Secret'],
+                    [envVariable: 'ARM_ACCESS_KEY', name: 'BACKEND-ACCESS-KEY', secretType: 'Secret'],
+                    [envVariable: 'LOCATION', name: 'LOCATION', secretType: 'Secret']
+                ]
+              )
+            }
+
+            steps {
+                    ansiColor('xterm') {
+                    withCredentials([azureServicePrincipal(
+                    credentialsId: '596bada5-c154-4b86-9da4-57721c2385e1',
+                    subscriptionIdVariable: 'ARM_SUBSCRIPTION_ID',
+                    clientIdVariable: 'ARM_CLIENT_ID',
+                    clientSecretVariable: 'ARM_CLIENT_SECRET',
+                    tenantIdVariable: 'ARM_TENANT_ID'
+                )]) {
+                        dir("src") {
+                        sh """
+                        echo "Applying the plan"
+                        terraform apply -auto-approve -var "resource_group_name=$RGPROJECT" -var "resource_group_region=$LOCATION"
+                        """
+                        }
+                     }
+                }
+             }
+        } 
+
     }
 }
